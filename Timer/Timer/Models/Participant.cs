@@ -13,6 +13,11 @@ namespace Timer.Models
         public int Id { get; set; }
 
         /// <summary>
+        /// 关联的项目ID
+        /// </summary>
+        public int? ProjectId { get; set; }
+
+        /// <summary>
         /// 序号，必须从1开始连续
         /// </summary>
         public int SequenceNumber { get; set; }
@@ -81,6 +86,39 @@ namespace Timer.Models
         /// UI选择状态（用于批量操作），不持久化到数据库
         /// </summary>
         public bool IsSelected { get; set; }
+
+        /// <summary>
+        /// 芯片内部号码（非持久化属性，用于UI显示）
+        /// </summary>
+        public string? ChipInternalNumber { get; set; }
+
+        /// <summary>
+        /// 组内序号（非持久化属性，用于UI显示）
+        /// </summary>
+        public int GroupSequenceNumber { get; set; }
+
+        /// <summary>
+        /// 完成的圈数（非持久化属性，用于成绩显示）
+        /// </summary>
+        public int TotalLaps { get; set; }
+
+        /// <summary>
+        /// 累计用时（毫秒）（非持久化属性，用于成绩显示）
+        /// </summary>
+        public long TotalTimeMs { get; set; }
+
+        /// <summary>
+        /// 累计用时格式化显示（精确到毫秒）
+        /// </summary>
+        public string TotalTimeFormatted
+        {
+            get
+            {
+                if (TotalTimeMs <= 0) return "-";
+                var ts = TimeSpan.FromMilliseconds(TotalTimeMs);
+                return $"{(int)ts.TotalHours:D2}:{ts.Minutes:D2}:{ts.Seconds:D2}.{ts.Milliseconds:D3}";
+            }
+        }
     }
 }
 

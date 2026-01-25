@@ -1,0 +1,58 @@
+<Window x:Class="Timer.Views.EditRaceGroupDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:converters="clr-namespace:Timer.Converters"
+        Title="编辑分组" Height="300" Width="450"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize"
+        Background="{StaticResource BackgroundBrush}"
+        Loaded="Window_Loaded">
+    <Window.Resources>
+        <converters:HexColorToBrushConverter x:Key="HexColorToBrushConverter"/>
+    </Window.Resources>
+
+    <Grid Margin="24">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- 选择芯片组 -->
+        <StackPanel Grid.Row="0" Style="{StaticResource FormFieldLargeStyle}">
+            <TextBlock Text="选择芯片组" Style="{StaticResource FormLabelStyle}" FontWeight="Bold"/>
+            <ComboBox ItemsSource="{Binding ChipGroups}" 
+                      SelectedValue="{Binding SelectedChipGroupId}" 
+                      SelectedValuePath="Id"
+                      Style="{StaticResource FormComboBoxStyle}">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal">
+                            <Rectangle Width="16" Height="16" 
+                                       Fill="{Binding Color, Converter={StaticResource HexColorToBrushConverter}}" 
+                                       Margin="0,0,8,0"/>
+                            <TextBlock Text="{Binding GroupName}" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+        </StackPanel>
+
+        <!-- 圈数配置（来源：人员分组配置，计时页不再设置） -->
+        <StackPanel Grid.Row="1" Style="{StaticResource FormFieldLargeStyle}">
+            <TextBlock Text="圈数" Style="{StaticResource FormLabelStyle}" FontWeight="Bold"/>
+            <ComboBox ItemsSource="{Binding LapOptions}"
+                      SelectedItem="{Binding SelectedLaps}"
+                      Style="{StaticResource FormComboBoxStyle}"/>
+        </StackPanel>
+
+        <!-- 按钮区 -->
+        <StackPanel Grid.Row="3" Style="{StaticResource DialogButtonPanelStyle}">
+            <Button Content="取消" Command="{Binding CancelCommand}" 
+                    Style="{StaticResource DialogCancelButtonStyle}" Width="100"/>
+            <Button Content="保存" Command="{Binding SaveCommand}" 
+                    Style="{StaticResource DialogSaveButtonStyle}" Width="100"/>
+        </StackPanel>
+    </Grid>
+</Window>

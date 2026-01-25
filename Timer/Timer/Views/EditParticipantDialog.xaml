@@ -20,12 +20,7 @@
         </Grid.RowDefinitions>
 
         <!-- 标题 -->
-        <TextBlock Grid.Row="0"
-                   Text="编辑参赛人员信息"
-                   FontSize="18"
-                   FontWeight="Bold"
-                   Foreground="{StaticResource TextColorBrush}"
-                   Margin="0,0,0,20"/>
+        <TextBlock Grid.Row="0" Text="编辑参赛人员信息" Style="{StaticResource DialogTitleStyle}"/>
 
         <!-- 表单区域 -->
         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
@@ -48,72 +43,37 @@
                 </Grid.RowDefinitions>
 
                 <!-- 比赛日期 -->
-                <TextBlock Grid.Row="0" Grid.Column="0"
-                           Text="比赛日期 *"
-                           FontSize="13"
-                           Foreground="{StaticResource TextColorBrush}"
-                           VerticalAlignment="Center"
-                           Margin="0,0,0,12"/>
+                <TextBlock Grid.Row="0" Grid.Column="0" Text="比赛日期 *" Style="{StaticResource FormLabelGridStyle}"/>
                 <DatePicker Grid.Row="0" Grid.Column="1"
                             SelectedDate="{Binding Date, UpdateSourceTrigger=PropertyChanged}"
-                            Height="36"
-                            Margin="0,0,0,12"/>
+                            Style="{StaticResource FormDatePickerStyle}"/>
 
                 <!-- 学校 -->
-                <TextBlock Grid.Row="1" Grid.Column="0"
-                           Text="学校"
-                           FontSize="13"
-                           Foreground="{StaticResource TextColorBrush}"
-                           VerticalAlignment="Center"
-                           Margin="0,0,0,12"/>
+                <TextBlock Grid.Row="1" Grid.Column="0" Text="学校" Style="{StaticResource FormLabelGridStyle}"/>
                 <TextBox Grid.Row="1" Grid.Column="1"
                          Text="{Binding School, UpdateSourceTrigger=PropertyChanged}"
-                         Height="36"
-                         Margin="0,0,0,12"/>
+                         Style="{StaticResource FormTextBoxStyle}"/>
 
                 <!-- 年级 -->
-                <TextBlock Grid.Row="2" Grid.Column="0"
-                           Text="年级"
-                           FontSize="13"
-                           Foreground="{StaticResource TextColorBrush}"
-                           VerticalAlignment="Center"
-                           Margin="0,0,0,12"/>
+                <TextBlock Grid.Row="2" Grid.Column="0" Text="年级" Style="{StaticResource FormLabelGridStyle}"/>
                 <TextBox Grid.Row="2" Grid.Column="1"
                          Text="{Binding Grade, UpdateSourceTrigger=PropertyChanged}"
-                         Height="36"
-                         Margin="0,0,0,12"/>
+                         Style="{StaticResource FormTextBoxStyle}"/>
 
                 <!-- 班级 -->
-                <TextBlock Grid.Row="3" Grid.Column="0"
-                           Text="班级"
-                           FontSize="13"
-                           Foreground="{StaticResource TextColorBrush}"
-                           VerticalAlignment="Center"
-                           Margin="0,0,0,12"/>
+                <TextBlock Grid.Row="3" Grid.Column="0" Text="班级" Style="{StaticResource FormLabelGridStyle}"/>
                 <TextBox Grid.Row="3" Grid.Column="1"
                          Text="{Binding Class, UpdateSourceTrigger=PropertyChanged}"
-                         Height="36"
-                         Margin="0,0,0,12"/>
+                         Style="{StaticResource FormTextBoxStyle}"/>
 
                 <!-- 姓名 -->
-                <TextBlock Grid.Row="4" Grid.Column="0"
-                           Text="姓名 *"
-                           FontSize="13"
-                           Foreground="{StaticResource TextColorBrush}"
-                           VerticalAlignment="Center"
-                           Margin="0,0,0,12"/>
+                <TextBlock Grid.Row="4" Grid.Column="0" Text="姓名 *" Style="{StaticResource FormLabelGridStyle}"/>
                 <TextBox Grid.Row="4" Grid.Column="1"
                          Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}"
-                         Height="36"
-                         Margin="0,0,0,12"/>
+                         Style="{StaticResource FormTextBoxStyle}"/>
 
                 <!-- 性别 -->
-                <TextBlock Grid.Row="5" Grid.Column="0"
-                           Text="性别 *"
-                           FontSize="13"
-                           Foreground="{StaticResource TextColorBrush}"
-                           VerticalAlignment="Center"
-                           Margin="0,0,0,12"/>
+                <TextBlock Grid.Row="5" Grid.Column="0" Text="性别 *" Style="{StaticResource FormLabelGridStyle}"/>
                 <ComboBox Grid.Row="5" Grid.Column="1"
                           ItemsSource="{Binding GenderOptions}"
                           SelectedItem="{Binding Gender, UpdateSourceTrigger=PropertyChanged}"
@@ -121,99 +81,52 @@
                           Margin="0,0,0,12"/>
 
                 <!-- 准考证号 -->
-                <TextBlock Grid.Row="6" Grid.Column="0"
-                           Text="准考证号"
-                           FontSize="13"
-                           Foreground="{StaticResource TextColorBrush}"
-                           VerticalAlignment="Center"
-                           Margin="0,0,0,12"/>
+                <TextBlock Grid.Row="6" Grid.Column="0" Text="准考证号" Style="{StaticResource FormLabelGridStyle}"/>
                 <TextBox Grid.Row="6" Grid.Column="1"
                          Text="{Binding ExamNumber, UpdateSourceTrigger=PropertyChanged}"
-                         Height="36"
-                         Margin="0,0,0,12"/>
+                         Style="{StaticResource FormTextBoxStyle}"/>
 
                 <!-- 组别 -->
-                <TextBlock Grid.Row="7" Grid.Column="0"
-                           Text="组别"
-                           FontSize="13"
-                           Foreground="{StaticResource TextColorBrush}"
-                           VerticalAlignment="Center"
-                           Margin="0,0,0,12"/>
+                <TextBlock Grid.Row="7" Grid.Column="0" Text="组别" Style="{StaticResource FormLabelGridStyle}"/>
                 <TextBox Grid.Row="7" Grid.Column="1"
                          Text="{Binding GroupName, UpdateSourceTrigger=PropertyChanged}"
-                         Height="36"
-                         Margin="0,0,0,12"/>
+                         Style="{StaticResource FormTextBoxStyle}"/>
 
                 <!-- 号码布 -->
-                <TextBlock Grid.Row="8" Grid.Column="0"
-                           Text="号码布"
-                           FontSize="13"
-                           Foreground="{StaticResource TextColorBrush}"
-                           VerticalAlignment="Center"
-                           Margin="0,0,0,12"/>
+                <TextBlock Grid.Row="8" Grid.Column="0" Text="号码布" Style="{StaticResource FormLabelGridStyle}"/>
                 <TextBox Grid.Row="8" Grid.Column="1"
                          Text="{Binding BibNumber, UpdateSourceTrigger=PropertyChanged}"
-                         Height="36"
-                         Margin="0,0,0,12"/>
+                         Style="{StaticResource FormTextBoxStyle}"/>
 
                 <!-- 芯片编号 -->
-                <TextBlock Grid.Row="9" Grid.Column="0"
-                           Text="芯片编号"
-                           FontSize="13"
-                           Foreground="{StaticResource TextColorBrush}"
-                           VerticalAlignment="Center"
-                           Margin="0,0,0,12"/>
+                <TextBlock Grid.Row="9" Grid.Column="0" Text="芯片编号" Style="{StaticResource FormLabelGridStyle}"/>
                 <TextBox Grid.Row="9" Grid.Column="1"
                          Text="{Binding ChipNumber, UpdateSourceTrigger=PropertyChanged}"
-                         Height="36"
-                         Margin="0,0,0,12"/>
+                         Style="{StaticResource FormTextBoxStyle}"/>
             </Grid>
         </ScrollViewer>
 
         <!-- 错误提示 -->
         <Border Grid.Row="2"
-                Background="#fff2f0"
-                BorderBrush="#ffccc7"
-                BorderThickness="1"
-                CornerRadius="4"
-                Padding="12"
-                Margin="0,0,0,16"
+                Style="{StaticResource ValidationErrorBorderStyle}"
                 Visibility="{Binding HasErrors, Converter={StaticResource BoolToVisibilityConverter}}">
             <StackPanel>
-                <TextBlock Text="请修正以下错误："
-                           FontSize="12"
-                           FontWeight="SemiBold"
-                           Foreground="#cf1322"
-                           Margin="0,0,0,8"/>
-                <ItemsControl ItemsSource="{Binding ValidationErrors}">
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <TextBlock Text="{Binding}"
-                                       FontSize="11"
-                                       Foreground="#cf1322"
-                                       Margin="0,2"/>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
+                <TextBlock Style="{StaticResource ValidationErrorTitleStyle}"/>
+                <ItemsControl ItemsSource="{Binding ValidationErrors}"
+                              ItemTemplate="{StaticResource ValidationErrorTemplate}"/>
             </StackPanel>
         </Border>
 
         <!-- 按钮 -->
-        <StackPanel Grid.Row="3"
-                    Orientation="Horizontal"
-                    HorizontalAlignment="Right">
+        <StackPanel Grid.Row="3" Style="{StaticResource DialogButtonPanelStyle}">
             <Button Content="取消"
                     Click="CancelButton_Click"
-                    Style="{StaticResource SecondaryButtonStyle}"
-                    Padding="24,8"
-                    Margin="0,0,12,0"
-                    FontSize="12"/>
+                    Style="{StaticResource DialogCancelButtonStyle}"
+                    Padding="24,8"/>
             <Button Content="保存"
                     Click="SaveButton_Click"
-                    Style="{StaticResource PrimaryButtonStyle}"
-                    Padding="24,8"
-                    FontSize="12"/>
+                    Style="{StaticResource DialogSaveButtonStyle}"
+                    Padding="24,8"/>
         </StackPanel>
     </Grid>
 </Window>
-

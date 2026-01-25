@@ -30,6 +30,24 @@ namespace Timer.Services
         }
 
         /// <summary>
+        /// 记录SQL执行日志
+        /// </summary>
+        private void LogSql(string operation, string sql, object? parameters = null)
+        {
+            var paramStr = parameters != null ? $", Params: {parameters}" : "";
+            _loggingService?.Debug($"[SQL] {operation}: {sql.Trim().Replace("\n", " ").Replace("  ", " ")}{paramStr}");
+        }
+
+        /// <summary>
+        /// 记录数据库异常
+        /// </summary>
+        private void LogDbError(string operation, Exception ex, string? sql = null)
+        {
+            var sqlInfo = sql != null ? $"\nSQL: {sql.Trim().Replace("\n", " ")}" : "";
+            _loggingService?.Error($"[数据库异常] {operation} 失败: {ex.Message}{sqlInfo}", ex);
+        }
+
+        /// <summary>
         /// 获取所有芯片组，包含每个组的芯片数量
         /// </summary>
         public async Task<IEnumerable<ChipGroup>> GetAllChipGroupsAsync()
@@ -51,6 +69,8 @@ namespace Timer.Services
                 ORDER BY cg.GroupName
             ";
 
+            LogSql("GetAllChipGroupsAsync", command.CommandText);
+
             var chipGroups = new List<ChipGroup>();
             using var reader = await command.ExecuteReaderAsync();
             while (await reader.ReadAsync())
@@ -58,6 +78,7 @@ namespace Timer.Services
                 chipGroups.Add(MapToChipGroup(reader));
             }
 
+            _loggingService?.Debug($"[SQL] GetAllChipGroupsAsync 返回 {chipGroups.Count} 条记录");
             return chipGroups;
         }
 
@@ -327,6 +348,64 @@ namespace Timer.Services
 
             var result = await command.ExecuteScalarAsync();
             return Convert.ToInt32(result) > 0;
+        }
+
+        /// <summary>
+        /// 清空所有芯片组和芯片数据
+        /// </summary>
+        public async Task DeleteAllChipGroupsAndChipsAsync()
+        {
+            _loggingService?.Info("[数据清空] 开始清空芯片相关数据...");
+            
+            try
+            {
+                var connection = await _dbContext.GetConnectionAsync();
+                
+                // 按外键依赖顺序删除数据：
+                // LapRecords -> RaceRecords -> RaceGroups -> Chips -> ChipGroups
+                
+                // 1. 删除所有圈次记录
+                var deleteLapRecordsCommand = connection.CreateCommand();
+                deleteLapRecordsCommand.CommandText = "DELETE FROM LapRecords";
+                LogSql("DeleteAllChipGroupsAndChipsAsync", deleteLapRecordsCommand.CommandText);
+                var lapRecordsDeleted = await deleteLapRecordsCommand.ExecuteNonQueryAsync();
+                _loggingService?.Debug($"[SQL] DELETE FROM LapRecords, 删除 {lapRecordsDeleted} 条记录");
+                
+                // 2. 删除所有比赛记录
+                var deleteRaceRecordsCommand = connection.CreateCommand();
+                deleteRaceRecordsCommand.CommandText = "DELETE FROM RaceRecords";
+                LogSql("DeleteAllChipGroupsAndChipsAsync", deleteRaceRecordsCommand.CommandText);
+                var raceRecordsDeleted = await deleteRaceRecordsCommand.ExecuteNonQueryAsync();
+                _loggingService?.Debug($"[SQL] DELETE FROM RaceRecords, 删除 {raceRecordsDeleted} 条记录");
+                
+                // 3. 删除所有比赛分组
+                var deleteRaceGroupsCommand = connection.CreateCommand();
+                deleteRaceGroupsCommand.CommandText = "DELETE FROM RaceGroups";
+                LogSql("DeleteAllChipGroupsAndChipsAsync", deleteRaceGroupsCommand.CommandText);
+                var raceGroupsDeleted = await deleteRaceGroupsCommand.ExecuteNonQueryAsync();
+                _loggingService?.Debug($"[SQL] DELETE FROM RaceGroups, 删除 {raceGroupsDeleted} 条记录");
+                
+                // 4. 删除所有芯片
+                var deleteChipsCommand = connection.CreateCommand();
+                deleteChipsCommand.CommandText = "DELETE FROM Chips";
+                LogSql("DeleteAllChipGroupsAndChipsAsync", deleteChipsCommand.CommandText);
+                var chipsDeleted = await deleteChipsCommand.ExecuteNonQueryAsync();
+                _loggingService?.Debug($"[SQL] DELETE FROM Chips, 删除 {chipsDeleted} 条记录");
+                
+                // 5. 删除所有芯片组
+                var deleteGroupsCommand = connection.CreateCommand();
+                deleteGroupsCommand.CommandText = "DELETE FROM ChipGroups";
+                LogSql("DeleteAllChipGroupsAndChipsAsync", deleteGroupsCommand.CommandText);
+                var groupsDeleted = await deleteGroupsCommand.ExecuteNonQueryAsync();
+                _loggingService?.Debug($"[SQL] DELETE FROM ChipGroups, 删除 {groupsDeleted} 条记录");
+                
+                _loggingService?.Info($"[数据清空] 完成，共删除: LapRecords={lapRecordsDeleted}, RaceRecords={raceRecordsDeleted}, RaceGroups={raceGroupsDeleted}, Chips={chipsDeleted}, ChipGroups={groupsDeleted}");
+            }
+            catch (Exception ex)
+            {
+                LogDbError("DeleteAllChipGroupsAndChipsAsync", ex);
+                throw; // 重新抛出异常，让调用者处理
+            }
         }
 
         /// <summary>

@@ -6,10 +6,15 @@ namespace Timer.Converters
 {
     /// <summary>
     /// 布尔值到可见性转换器，用于将bool值或整数转换为Visibility枚举值
-    /// 支持 ConverterParameter="Invert" 参数来反转逻辑
+    /// 支持 ConverterParameter="Invert" 参数或 IsInverted 属性来反转逻辑
     /// </summary>
     public class BoolToVisibilityConverter : IValueConverter
     {
+        /// <summary>
+        /// 是否反转结果
+        /// </summary>
+        public bool IsInverted { get; set; }
+
         /// <summary>
         /// 将bool值或整数转换为Visibility
         /// </summary>
@@ -35,8 +40,8 @@ namespace Timer.Converters
                 isVisible = longValue > 0;
             }
             
-            // 如果参数是 "Invert"，则反转可见性
-            if (parameter is string param && param == "Invert")
+            // 如果参数是 "Invert" 或 IsInverted 为 true，则反转可见性
+            if (IsInverted || (parameter is string param && param == "Invert"))
             {
                 isVisible = !isVisible;
             }
@@ -56,7 +61,8 @@ namespace Timer.Converters
         {
             if (value is Visibility visibility)
             {
-                return visibility == Visibility.Visible;
+                var result = visibility == Visibility.Visible;
+                return IsInverted ? !result : result;
             }
             return false;
         }

@@ -30,6 +30,24 @@ namespace Timer.Services
         }
 
         /// <summary>
+        /// 记录SQL执行日志
+        /// </summary>
+        private void LogSql(string operation, string sql, object? parameters = null)
+        {
+            var paramStr = parameters != null ? $", Params: {parameters}" : "";
+            _loggingService?.Debug($"[SQL] {operation}: {sql.Trim().Replace("\n", " ").Replace("  ", " ")}{paramStr}");
+        }
+
+        /// <summary>
+        /// 记录数据库异常
+        /// </summary>
+        private void LogDbError(string operation, Exception ex, string? sql = null)
+        {
+            var sqlInfo = sql != null ? $"\nSQL: {sql.Trim().Replace("\n", " ")}" : "";
+            _loggingService?.Error($"[数据库异常] {operation} 失败: {ex.Message}{sqlInfo}", ex);
+        }
+
+        /// <summary>
         /// 获取参赛人员列表，支持搜索和分页
         /// </summary>
         public async Task<IEnumerable<Participant>> GetAllAsync(SearchFilter filter)
@@ -108,6 +126,8 @@ namespace Timer.Services
                 command.Parameters.Add(param);
             }
 
+            LogSql("GetAllAsync", command.CommandText, $"PageSize={filter.PageSize}, Skip={filter.Skip}");
+
             var participants = new List<Participant>();
             using var reader = await command.ExecuteReaderAsync();
             while (await reader.ReadAsync())
@@ -115,6 +135,7 @@ namespace Timer.Services
                 participants.Add(MapToParticipant(reader));
             }
 
+            _loggingService?.Debug($"[SQL] GetAllAsync 返回 {participants.Count} 条记录");
             return participants;
         }
 
@@ -260,8 +281,8 @@ namespace Timer.Services
             var command = connection.CreateCommand();
 
             command.CommandText = @"
-                INSERT INTO Participants (SequenceNumber, Date, School, Grade, Class, Name, Gender, ExamNumber, GroupName, BibNumber, ChipNumber, CreatedAt, UpdatedAt)
-                VALUES (@sequenceNumber, @date, @school, @grade, @class, @name, @gender, @examNumber, @groupName, @bibNumber, @chipNumber, @createdAt, @updatedAt);
+                INSERT INTO Participants (ProjectId, SequenceNumber, Date, School, Grade, Class, Name, Gender, ExamNumber, GroupName, BibNumber, ChipNumber, CreatedAt, UpdatedAt)
+                VALUES (@projectId, @sequenceNumber, @date, @school, @grade, @class, @name, @gender, @examNumber, @groupName, @bibNumber, @chipNumber, @createdAt, @updatedAt);
                 SELECT last_insert_rowid();
             ";
 
@@ -293,7 +314,7 @@ namespace Timer.Services
 
             command.CommandText = @"
                 UPDATE Participants
-                SET SequenceNumber = @sequenceNumber, Date = @date, School = @school, Grade = @grade, Class = @class,
+                SET ProjectId = @projectId, SequenceNumber = @sequenceNumber, Date = @date, School = @school, Grade = @grade, Class = @class,
                     Name = @name, Gender = @gender, ExamNumber = @examNumber, GroupName = @groupName,
                     BibNumber = @bibNumber, ChipNumber = @chipNumber, UpdatedAt = @updatedAt
                 WHERE Id = @id
@@ -351,6 +372,20 @@ namespace Timer.Services
             {
                 command.Parameters.Add(new SqliteParameter($"@id{i}", idList[i]));
             }
+
+            await command.ExecuteNonQueryAsync();
+        }
+
+        /// <summary>
+        /// 根据项目ID删除所有参赛人员
+        /// </summary>
+        public async Task DeleteByProjectIdAsync(int projectId)
+        {
+            var connection = await _dbContext.GetConnectionAsync();
+            var command = connection.CreateCommand();
+
+            command.CommandText = "DELETE FROM Participants WHERE ProjectId = @projectId";
+            command.Parameters.Add(new SqliteParameter("@projectId", projectId));
 
             await command.ExecuteNonQueryAsync();
         }
@@ -449,6 +484,7 @@ namespace Timer.Services
         /// </summary>
         private void AddParticipantParameters(SqliteCommand command, Participant participant)
         {
+            command.Parameters.Add(new SqliteParameter("@projectId", participant.ProjectId.HasValue ? participant.ProjectId.Value : (object)DBNull.Value));
             command.Parameters.Add(new SqliteParameter("@sequenceNumber", participant.SequenceNumber));
             command.Parameters.Add(new SqliteParameter("@date", participant.Date.ToString("yyyy-MM-dd HH:mm:ss")));
             command.Parameters.Add(new SqliteParameter("@school", participant.School ?? (object)DBNull.Value));

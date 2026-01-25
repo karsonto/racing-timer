@@ -218,6 +218,30 @@
         <Setter Property="CanUserAddRows" Value="False"/>
     </Style>
 
+    <!-- DataGridTextColumn 默认居中（显示/编辑）
+         关键点：元素要 Stretch 填满单元格宽度，才能保证与表头严格对齐；
+         仅仅 HorizontalAlignment=Center 会出现“内容居中但列对不齐”的视觉问题。 -->
+    <Style TargetType="DataGridTextColumn">
+        <Setter Property="ElementStyle">
+            <Setter.Value>
+                <Style TargetType="TextBlock">
+                    <Setter Property="HorizontalAlignment" Value="Stretch"/>
+                    <Setter Property="VerticalAlignment" Value="Center"/>
+                    <Setter Property="TextAlignment" Value="Center"/>
+                    <Setter Property="TextWrapping" Value="NoWrap"/>
+                </Style>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="EditingElementStyle">
+            <Setter.Value>
+                <Style TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}">
+                    <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                    <Setter Property="VerticalContentAlignment" Value="Center"/>
+                </Style>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
     <!-- DataGrid列头样式 -->
     <Style TargetType="DataGridColumnHeader">
         <Setter Property="Background" Value="{StaticResource TableHeaderBackgroundBrush}"/>
@@ -227,6 +251,8 @@
         <Setter Property="Padding" Value="12,10"/>
         <Setter Property="FontWeight" Value="SemiBold"/>
         <Setter Property="FontSize" Value="14"/>
+        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
     </Style>
 
     <!-- DataGrid行样式 -->
@@ -249,24 +275,12 @@
     <Style TargetType="DataGridCell">
         <Setter Property="BorderBrush" Value="{StaticResource TableRowSeparatorBrush}"/>
         <Setter Property="BorderThickness" Value="0,0,0,1"/>
-        <Setter Property="Padding" Value="8,0"/>
+        <Setter Property="Padding" Value="8,6"/>
         <Setter Property="VerticalContentAlignment" Value="Center"/>
-        <Setter Property="VerticalAlignment" Value="Stretch"/>
+        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
         <Setter Property="Background" Value="Transparent"/>
         <Setter Property="Foreground" Value="{StaticResource TextColorBrush}"/>
         <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="DataGridCell">
-                    <Border Background="{TemplateBinding Background}"
-                            BorderBrush="{TemplateBinding BorderBrush}"
-                            BorderThickness="{TemplateBinding BorderThickness}"
-                            Padding="{TemplateBinding Padding}">
-                        <ContentPresenter VerticalAlignment="Center"/>
-                    </Border>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
         <Style.Triggers>
             <Trigger Property="IsSelected" Value="True">
                 <Setter Property="Background" Value="Transparent"/>
@@ -381,6 +395,137 @@
                 </DataTrigger.ExitActions>
             </DataTrigger>
         </Style.Triggers>
+    </Style>
+
+    <!-- 对话框标题样式 -->
+    <Style x:Key="DialogTitleStyle" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="18"/>
+        <Setter Property="FontWeight" Value="Bold"/>
+        <Setter Property="Foreground" Value="{StaticResource TextColorBrush}"/>
+        <Setter Property="Margin" Value="0,0,0,16"/>
+    </Style>
+
+    <!-- 表单标签样式 -->
+    <Style x:Key="FormLabelStyle" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="14"/>
+        <Setter Property="Foreground" Value="{StaticResource TextColorBrush}"/>
+        <Setter Property="Margin" Value="0,0,0,6"/>
+    </Style>
+
+    <!-- 表单标签样式（Grid布局） -->
+    <Style x:Key="FormLabelGridStyle" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="14"/>
+        <Setter Property="Foreground" Value="{StaticResource TextColorBrush}"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="HorizontalAlignment" Value="Right"/>
+        <Setter Property="Margin" Value="0,0,12,0"/>
+    </Style>
+
+    <!-- 表单字段容器样式 -->
+    <Style x:Key="FormFieldStyle" TargetType="StackPanel">
+        <Setter Property="Margin" Value="0,0,0,16"/>
+    </Style>
+
+    <!-- 表单字段容器样式（较大间距） -->
+    <Style x:Key="FormFieldLargeStyle" TargetType="StackPanel">
+        <Setter Property="Margin" Value="0,0,0,20"/>
+    </Style>
+
+    <!-- 表单文本框样式 -->
+    <Style x:Key="FormTextBoxStyle" TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}">
+        <Setter Property="MinHeight" Value="32"/>
+    </Style>
+
+    <!-- 表单下拉框样式 -->
+    <Style x:Key="FormComboBoxStyle" TargetType="ComboBox" BasedOn="{StaticResource {x:Type ComboBox}}">
+        <Setter Property="MinHeight" Value="32"/>
+    </Style>
+
+    <!-- 表单日期选择器样式 -->
+    <Style x:Key="FormDatePickerStyle" TargetType="DatePicker" BasedOn="{StaticResource {x:Type DatePicker}}">
+        <Setter Property="MinHeight" Value="32"/>
+    </Style>
+
+    <!-- 只读文本框样式 -->
+    <Style x:Key="ReadOnlyTextBoxStyle" TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}">
+        <Setter Property="IsReadOnly" Value="True"/>
+        <Setter Property="Background" Value="#f5f5f5"/>
+        <Setter Property="MinHeight" Value="32"/>
+    </Style>
+
+    <!-- 验证错误边框样式 -->
+    <Style x:Key="ValidationErrorBorderStyle" TargetType="Border">
+        <Setter Property="Background" Value="#fef2f2"/>
+        <Setter Property="BorderBrush" Value="#ef4444"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="CornerRadius" Value="4"/>
+        <Setter Property="Padding" Value="12"/>
+    </Style>
+
+    <!-- 验证错误标题样式 -->
+    <Style x:Key="ValidationErrorTitleStyle" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="14"/>
+        <Setter Property="FontWeight" Value="Bold"/>
+        <Setter Property="Foreground" Value="#dc2626"/>
+        <Setter Property="Text" Value="请修正以下错误："/>
+        <Setter Property="Margin" Value="0,0,0,8"/>
+    </Style>
+
+    <!-- 验证错误项模板（ObservableCollection<string>） -->
+    <DataTemplate x:Key="ValidationErrorTemplate">
+        <TextBlock Text="{Binding}"
+                   Foreground="#dc2626"
+                   FontSize="13"
+                   TextWrapping="Wrap"
+                   Margin="0,2,0,0"/>
+    </DataTemplate>
+
+    <!-- 对话框按钮面板样式 -->
+    <Style x:Key="DialogButtonPanelStyle" TargetType="StackPanel">
+        <Setter Property="Orientation" Value="Horizontal"/>
+        <Setter Property="HorizontalAlignment" Value="Right"/>
+        <Setter Property="Margin" Value="0,16,0,0"/>
+    </Style>
+
+    <!-- 对话框取消按钮样式 -->
+    <Style x:Key="DialogCancelButtonStyle" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+        <Setter Property="MinWidth" Value="100"/>
+        <Setter Property="Margin" Value="0,0,12,0"/>
+        <Setter Property="Padding" Value="16,8"/>
+    </Style>
+
+    <!-- 对话框保存按钮样式 -->
+    <Style x:Key="DialogSaveButtonStyle" TargetType="Button" BasedOn="{StaticResource PrimaryButtonStyle}">
+        <Setter Property="MinWidth" Value="100"/>
+        <Setter Property="Padding" Value="16,8"/>
+    </Style>
+
+    <!-- 状态徽章样式 -->
+    <Style x:Key="StatusBadgeStyle" TargetType="Border">
+        <Setter Property="CornerRadius" Value="12"/>
+        <Setter Property="Padding" Value="8,4"/>
+        <Setter Property="HorizontalAlignment" Value="Center"/>
+    </Style>
+
+    <!-- 加载遮罩层样式 -->
+    <Style x:Key="LoadingOverlayStyle" TargetType="Border">
+        <Setter Property="Background" Value="#80000000"/>
+        <Setter Property="Panel.ZIndex" Value="1000"/>
+        <Setter Property="Visibility" Value="Collapsed"/>
+    </Style>
+
+    <!-- 加载遮罩层内容面板样式 -->
+    <Style x:Key="LoadingPanelStyle" TargetType="Border">
+        <Setter Property="Background" Value="White"/>
+        <Setter Property="CornerRadius" Value="8"/>
+        <Setter Property="Padding" Value="32,24"/>
+        <Setter Property="HorizontalAlignment" Value="Center"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="Effect">
+            <Setter.Value>
+                <DropShadowEffect Color="#40000000" Direction="270" ShadowDepth="4" BlurRadius="12" Opacity="0.3"/>
+            </Setter.Value>
+        </Setter>
     </Style>
 
 </ResourceDictionary>

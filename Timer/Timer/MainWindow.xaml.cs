@@ -20,7 +20,8 @@ namespace Timer
             
             var navigationService = new NavigationService();
             var dbContext = App.GetDatabaseContext();
-            _viewModel = new MainViewModel(navigationService, dbContext);
+            var loggingService = App.GetLoggingService();
+            _viewModel = new MainViewModel(navigationService, dbContext, loggingService);
             DataContext = _viewModel;
         }
 

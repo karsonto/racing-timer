@@ -1,0 +1,77 @@
+name: PR 检查
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+# 添加必要的权限配置
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+
+jobs:
+  pr-validation:
+    name: PR 验证
+    runs-on: windows-latest
+    
+    steps:
+    - name: 检出代码
+      uses: actions/checkout@v6
+      with:
+        fetch-depth: 0
+        
+    - name: 设置 .NET
+      uses: actions/setup-dotnet@v5
+      with:
+        dotnet-version: '10.0.x'
+        
+    - name: 还原依赖
+      run: dotnet restore Timer/Timer/Timer.csproj
+      
+    - name: 检查编译 (Debug)
+      run: dotnet build Timer/Timer/Timer.csproj --configuration Debug --no-restore
+      
+    - name: 检查编译 (Release)
+      run: dotnet build Timer/Timer/Timer.csproj --configuration Release --no-restore
+      
+    - name: 检查 XAML 语法
+      run: dotnet build Timer/Timer/Timer.csproj --no-restore
+      continue-on-error: false
+      
+    - name: PR 大小检查
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const pr = context.payload.pull_request;
+          const additions = pr.additions;
+          const deletions = pr.deletions;
+          const total = additions + deletions;
+          
+          console.log(`PR 变更统计: +${additions} -${deletions} (总计: ${total})`);
+          
+          if (total > 1000) {
+            core.warning(`⚠️ 这个 PR 改动较大 (${total} 行)，建议拆分成更小的 PR`);
+          }
+          
+    - name: 添加 PR 评论
+      uses: actions/github-script@v7
+      if: success()
+      continue-on-error: true
+      with:
+        script: |
+          const comment = `✅ **自动化检查通过**
+          
+          - ✅ Debug 构建成功
+          - ✅ Release 构建成功
+          - ✅ XAML 语法检查通过
+          
+          构建产物可在 Actions 标签页下载。`;
+          
+          github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: comment
+          });
+

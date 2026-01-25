@@ -6,237 +6,126 @@
     <UserControl.Resources>
         <converters:NullToVisibilityConverter x:Key="NullToVisibilityConverter"/>
         <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+        
+        <!-- 统一的 ComboBox 样式：选项文字左对齐 -->
+        <Style x:Key="CenteredComboBoxStyle" TargetType="ComboBox">
+            <Setter Property="Height" Value="36"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+        </Style>
+        
+        <!-- 带禁用状态的 ComboBox 样式 -->
+        <Style x:Key="CenteredComboBoxWithDisableStyle" TargetType="ComboBox" BasedOn="{StaticResource CenteredComboBoxStyle}">
+            <Setter Property="IsEnabled" Value="True"/>
+        </Style>
+        
+        <!-- DatePicker 样式：内容居中 -->
+        <Style x:Key="CenteredDatePickerStyle" TargetType="DatePicker">
+            <Setter Property="Height" Value="36"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
     </UserControl.Resources>
-    <Grid Margin="16">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
+    <Grid>
+        <!-- 主内容区域 -->
+        <Grid Margin="16">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
 
-        <!-- 筛选区域卡片 -->
-        <Border Grid.Row="0" 
-                Style="{StaticResource CardStyle}"
-                Margin="0,0,0,16">
+            <!-- 顶部查询区 -->
+        <Border Grid.Row="0" Style="{StaticResource CardStyle}" Padding="20" Margin="0,0,0,16">
             <StackPanel>
-                <!-- 标题 -->
-                <StackPanel Orientation="Horizontal" Margin="0,0,0,16">
-                    <Border Width="24" Height="24" 
-                            Background="{StaticResource PrimaryColorBrush}" 
-                            CornerRadius="4" 
-                            Margin="0,0,8,0">
-                        <TextBlock Text="👥" 
-                                   FontSize="14" 
-                                   HorizontalAlignment="Center" 
-                                   VerticalAlignment="Center"/>
-                    </Border>
-                    <TextBlock Text="参赛人员" 
-                               FontSize="18" 
-                               FontWeight="Bold"
-                               Foreground="{StaticResource TextColorBrush}"
-                               VerticalAlignment="Center"/>
-                </StackPanel>
-
-                <!-- 筛选控件 -->
+                <TextBlock Text="查询条件" FontSize="16" FontWeight="Bold" Foreground="{StaticResource TextColorBrush}" Margin="0,0,0,16"/>
+                
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
 
-                    <!-- 开始日期 -->
-                    <StackPanel Grid.Column="0" Grid.Row="0" Margin="0,0,12,12">
-                        <TextBlock Text="开始日期" 
-                                   FontSize="12" 
-                                   Foreground="{StaticResource SecondaryTextColorBrush}"
-                                   Margin="0,0,0,4"/>
-                        <DatePicker SelectedDate="{Binding StartDate, UpdateSourceTrigger=PropertyChanged}"
-                                    SelectedDateFormat="Short"
-                                    Width="140"
-                                    Height="32"/>
-                    </StackPanel>
+                    <!-- 第一行 -->
+                    <TextBlock Grid.Row="0" Grid.Column="0" Text="开始日期：" VerticalAlignment="Center" Margin="0,0,12,0"/>
+                    <DatePicker Grid.Row="0" Grid.Column="1" SelectedDate="{Binding StartDate}" 
+                                Style="{StaticResource CenteredDatePickerStyle}" Margin="0,0,16,0"/>
 
-                    <!-- 结束日期 -->
-                    <StackPanel Grid.Column="1" Grid.Row="0" Margin="0,0,12,12">
-                        <TextBlock Text="结束日期" 
-                                   FontSize="12" 
-                                   Foreground="{StaticResource SecondaryTextColorBrush}"
-                                   Margin="0,0,0,4"/>
-                        <DatePicker SelectedDate="{Binding EndDate, UpdateSourceTrigger=PropertyChanged}"
-                                    SelectedDateFormat="Short"
-                                    Width="140"
-                                    Height="32"/>
-                    </StackPanel>
+                    <TextBlock Grid.Row="0" Grid.Column="2" Text="结束日期：" VerticalAlignment="Center" Margin="0,0,12,0"/>
+                    <DatePicker Grid.Row="0" Grid.Column="3" SelectedDate="{Binding EndDate}" 
+                                Style="{StaticResource CenteredDatePickerStyle}" Margin="0,0,16,0"/>
 
-                    <!-- 学校 -->
-                    <StackPanel Grid.Column="2" Grid.Row="0" Margin="0,0,12,12">
-                        <TextBlock Text="学校" 
-                                   FontSize="12" 
-                                   Foreground="{StaticResource SecondaryTextColorBrush}"
-                                   Margin="0,0,0,4"/>
-                        <ComboBox ItemsSource="{Binding Schools}"
-                                  SelectedItem="{Binding SelectedSchool, UpdateSourceTrigger=PropertyChanged}"
-                                  Width="140"
-                                  Height="32">
-                            <ComboBox.ItemTemplate>
-                                <DataTemplate>
-                                    <TextBlock Text="{Binding}"/>
-                                </DataTemplate>
-                            </ComboBox.ItemTemplate>
-                        </ComboBox>
-                    </StackPanel>
+                    <TextBlock Grid.Row="0" Grid.Column="4" Text="学校：" VerticalAlignment="Center" Margin="0,0,12,0"/>
+                    <ComboBox Grid.Row="0" Grid.Column="5" ItemsSource="{Binding Schools}" 
+                              SelectedItem="{Binding SelectedSchool}" Style="{StaticResource CenteredComboBoxStyle}"/>
 
-                    <!-- 年级 -->
-                    <StackPanel Grid.Column="3" Grid.Row="0" Margin="0,0,12,12">
-                        <TextBlock Text="年级" 
-                                   FontSize="12" 
-                                   Foreground="{StaticResource SecondaryTextColorBrush}"
-                                   Margin="0,0,0,4"/>
-                        <ComboBox ItemsSource="{Binding Grades}"
-                                  SelectedItem="{Binding SelectedGrade, UpdateSourceTrigger=PropertyChanged}"
-                                  Width="140"
-                                  Height="32">
-                            <ComboBox.Style>
-                                <Style TargetType="ComboBox">
-                                    <Setter Property="IsEnabled" Value="True"/>
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding Grades.Count}" Value="0">
-                                            <Setter Property="IsEnabled" Value="False"/>
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </ComboBox.Style>
-                            <ComboBox.ItemTemplate>
-                                <DataTemplate>
-                                    <TextBlock Text="{Binding}"/>
-                                </DataTemplate>
-                            </ComboBox.ItemTemplate>
-                        </ComboBox>
-                    </StackPanel>
+                    <!-- 第二行 -->
+                    <TextBlock Grid.Row="1" Grid.Column="0" Text="年级：" VerticalAlignment="Center" Margin="0,12,12,0"/>
+                    <ComboBox Grid.Row="1" Grid.Column="1" ItemsSource="{Binding Grades}" 
+                              SelectedItem="{Binding SelectedGrade}" Margin="0,12,16,0">
+                        <ComboBox.Style>
+                            <Style TargetType="ComboBox" BasedOn="{StaticResource CenteredComboBoxStyle}">
+                                <Setter Property="IsEnabled" Value="True"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Grades.Count}" Value="0">
+                                        <Setter Property="IsEnabled" Value="False"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </ComboBox.Style>
+                    </ComboBox>
 
-                    <!-- 班级 -->
-                    <StackPanel Grid.Column="4" Grid.Row="0" Margin="0,0,12,12">
-                        <TextBlock Text="班级" 
-                                   FontSize="12" 
-                                   Foreground="{StaticResource SecondaryTextColorBrush}"
-                                   Margin="0,0,0,4"/>
-                        <ComboBox ItemsSource="{Binding Classes}"
-                                  SelectedItem="{Binding SelectedClass, UpdateSourceTrigger=PropertyChanged}"
-                                  Width="140"
-                                  Height="32">
-                            <ComboBox.Style>
-                                <Style TargetType="ComboBox">
-                                    <Setter Property="IsEnabled" Value="True"/>
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding Classes.Count}" Value="0">
-                                            <Setter Property="IsEnabled" Value="False"/>
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </ComboBox.Style>
-                            <ComboBox.ItemTemplate>
-                                <DataTemplate>
-                                    <TextBlock Text="{Binding}"/>
-                                </DataTemplate>
-                            </ComboBox.ItemTemplate>
-                        </ComboBox>
-                    </StackPanel>
+                    <TextBlock Grid.Row="1" Grid.Column="2" Text="班级：" VerticalAlignment="Center" Margin="0,12,12,0"/>
+                    <ComboBox Grid.Row="1" Grid.Column="3" ItemsSource="{Binding Classes}" 
+                              SelectedItem="{Binding SelectedClass}" Margin="0,12,16,0">
+                        <ComboBox.Style>
+                            <Style TargetType="ComboBox" BasedOn="{StaticResource CenteredComboBoxStyle}">
+                                <Setter Property="IsEnabled" Value="True"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Classes.Count}" Value="0">
+                                        <Setter Property="IsEnabled" Value="False"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </ComboBox.Style>
+                    </ComboBox>
 
-                    <!-- 组别 -->
-                    <StackPanel Grid.Column="5" Grid.Row="0" Margin="0,0,12,12">
-                        <TextBlock Text="组别" 
-                                   FontSize="12" 
-                                   Foreground="{StaticResource SecondaryTextColorBrush}"
-                                   Margin="0,0,0,4"/>
-                        <ComboBox ItemsSource="{Binding GroupNames}"
-                                  SelectedItem="{Binding SearchFilter.GroupName, UpdateSourceTrigger=PropertyChanged}"
-                                  Width="140"
-                                  Height="32">
-                            <ComboBox.Style>
-                                <Style TargetType="ComboBox">
-                                    <Setter Property="IsEnabled" Value="True"/>
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding GroupNames.Count}" Value="0">
-                                            <Setter Property="IsEnabled" Value="False"/>
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </ComboBox.Style>
-                            <ComboBox.ItemTemplate>
-                                <DataTemplate>
-                                    <TextBlock Text="{Binding}"/>
-                                </DataTemplate>
-                            </ComboBox.ItemTemplate>
-                        </ComboBox>
-                    </StackPanel>
-
-                    <!-- 查询按钮：紧贴筛选项后面 -->
-                    <Button Grid.Column="6"
-                            Grid.Row="0"
-                            Content="查询"
-                            Command="{Binding SearchCommand}"
-                            Style="{StaticResource PrimaryButtonStyle}"
-                            VerticalAlignment="Bottom"
-                            Margin="0,0,12,12"/>
-
-                    <!-- 导入按钮：单独最右边 -->
-                    <Button Grid.Column="8"
-                            Grid.Row="0"
-                            Content="导入人员信息"
-                            Command="{Binding ImportCommand}"
-                            Style="{StaticResource SecondaryButtonStyle}"
-                            VerticalAlignment="Bottom"
-                            Margin="0,0,0,12"/>
+                    <TextBlock Grid.Row="1" Grid.Column="4" Text="组别：" VerticalAlignment="Center" Margin="0,12,12,0"/>
+                    <ComboBox Grid.Row="1" Grid.Column="5" ItemsSource="{Binding GroupNames}" 
+                              SelectedItem="{Binding SelectedGroup}" Margin="0,12,0,0">
+                        <ComboBox.Style>
+                            <Style TargetType="ComboBox" BasedOn="{StaticResource CenteredComboBoxStyle}">
+                                <Setter Property="IsEnabled" Value="True"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding GroupNames.Count}" Value="0">
+                                        <Setter Property="IsEnabled" Value="False"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </ComboBox.Style>
+                    </ComboBox>
                 </Grid>
-            </StackPanel>
-        </Border>
 
-        <!-- 导入进度和结果 -->
-        <Border Grid.Row="1" 
-                Style="{StaticResource CardStyle}"
-                Margin="0,0,0,16"
-                Visibility="{Binding ImportResult, Converter={StaticResource NullToVisibilityConverter}}">
-            <StackPanel>
-                <ProgressBar Value="{Binding ImportProgress}" 
-                             Maximum="100" 
-                             Height="8" 
-                             Margin="0,0,0,8"
-                             Background="{StaticResource BorderColorBrush}"
-                             Foreground="{StaticResource PrimaryColorBrush}"/>
-                <TextBlock Text="{Binding ImportResult, StringFormat='导入结果：成功 {0.SuccessCount} 条，失败 {0.FailureCount} 条'}"
-                           FontSize="12"
-                           Foreground="{StaticResource SecondaryTextColorBrush}"
-                           Margin="0,0,0,8"/>
-                <ItemsControl ItemsSource="{Binding ImportResult.Errors}" 
-                              MaxHeight="150"
-                              Margin="0,0,0,8">
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <TextBlock Text="{Binding}" 
-                                       FontSize="11"
-                                       Foreground="#ff4d4f"
-                                       Margin="0,2"/>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,16,0,0">
+                    <Button Content="查询" Command="{Binding SearchCommand}" 
+                            Style="{StaticResource PrimaryButtonStyle}" Width="120" Margin="0,0,12,0"/>
+                    <Button Content="导入参数人员" Command="{Binding ImportCommand}" 
+                            Style="{StaticResource PrimaryButtonStyle}" Width="140" Background="#22c55e" BorderBrush="#22c55e"/>
+                </StackPanel>
             </StackPanel>
         </Border>
 
         <!-- 数据表格卡片 -->
-        <Border Grid.Row="2" 
-                Style="{StaticResource CardStyle}">
+        <Border Grid.Row="1" 
+                Style="{StaticResource CardStyle}"
+                Padding="16">
             <StackPanel>
                 <!-- 顶部：记录数 + 批量操作 -->
                 <Grid Margin="0,0,0,12">
@@ -269,30 +158,112 @@
                           HeadersVisibility="Column"
                           SelectionMode="Single"
                           SelectionUnit="FullRow"
-                          Height="400">
+                          Height="400"
+                          RowHeight="40"
+                          ColumnHeaderHeight="40">
+                    <!-- 单元格样式：垂直居中，左对齐 -->
+                    <DataGrid.CellStyle>
+                        <Style TargetType="DataGridCell">
+                            <Setter Property="VerticalAlignment" Value="Stretch"/>
+                            <Setter Property="VerticalContentAlignment" Value="Center"/>
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="DataGridCell">
+                                        <Grid Background="{TemplateBinding Background}">
+                                            <ContentPresenter VerticalAlignment="Center" Margin="4,0"/>
+                                        </Grid>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </DataGrid.CellStyle>
+                    <!-- 表头样式：左对齐，垂直居中 -->
+                    <DataGrid.ColumnHeaderStyle>
+                        <Style TargetType="DataGridColumnHeader">
+                            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+                            <Setter Property="VerticalContentAlignment" Value="Center"/>
+                            <Setter Property="Padding" Value="4,0"/>
+                        </Style>
+                    </DataGrid.ColumnHeaderStyle>
                     <DataGrid.Columns>
                         <DataGridTemplateColumn Header="" Width="44">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
                                     <CheckBox IsChecked="{Binding IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                               VerticalAlignment="Center"
-                                              HorizontalAlignment="Center"/>
+                                              HorizontalAlignment="Left"/>
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
-                        <DataGridTextColumn Header="比赛日期" Binding="{Binding Date, StringFormat=yyyy-M-d}" Width="120"/>
-                        <DataGridTextColumn Header="学校" Binding="{Binding School}" Width="120"/>
-                        <DataGridTextColumn Header="年级" Binding="{Binding Grade}" Width="100"/>
-                        <DataGridTextColumn Header="班级" Binding="{Binding Class}" Width="100"/>
-                        <DataGridTextColumn Header="组别" Binding="{Binding GroupName}" Width="120"/>
-                        <DataGridTextColumn Header="姓名" Binding="{Binding Name}" Width="120"/>
-                        <DataGridTextColumn Header="性别" Binding="{Binding Gender}" Width="80"/>
-                        <DataGridTextColumn Header="准考证号" Binding="{Binding ExamNumber}" Width="140"/>
-                        <DataGridTemplateColumn Header="操作" Width="140">
+                        <DataGridTextColumn Header="比赛日期" Binding="{Binding Date, StringFormat=yyyy-M-d}" Width="120">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="VerticalAlignment" Value="Center"/>
+                                    <Setter Property="TextAlignment" Value="Left"/>
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+                        <DataGridTextColumn Header="学校" Binding="{Binding School}" Width="120">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="VerticalAlignment" Value="Center"/>
+                                    <Setter Property="TextAlignment" Value="Left"/>
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+                        <DataGridTextColumn Header="年级" Binding="{Binding Grade}" Width="100">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="VerticalAlignment" Value="Center"/>
+                                    <Setter Property="TextAlignment" Value="Left"/>
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+                        <DataGridTextColumn Header="班级" Binding="{Binding Class}" Width="100">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="VerticalAlignment" Value="Center"/>
+                                    <Setter Property="TextAlignment" Value="Left"/>
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+                        <DataGridTextColumn Header="组别" Binding="{Binding GroupName}" Width="120">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="VerticalAlignment" Value="Center"/>
+                                    <Setter Property="TextAlignment" Value="Left"/>
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+                        <DataGridTextColumn Header="姓名" Binding="{Binding Name}" Width="120">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="VerticalAlignment" Value="Center"/>
+                                    <Setter Property="TextAlignment" Value="Left"/>
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+                        <DataGridTextColumn Header="性别" Binding="{Binding Gender}" Width="80">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="VerticalAlignment" Value="Center"/>
+                                    <Setter Property="TextAlignment" Value="Left"/>
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+                        <DataGridTextColumn Header="准考证号" Binding="{Binding ExamNumber}" Width="140">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="VerticalAlignment" Value="Center"/>
+                                    <Setter Property="TextAlignment" Value="Left"/>
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+                        <DataGridTemplateColumn Header="操作" Width="*">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
                                     <StackPanel Orientation="Horizontal" 
-                                                HorizontalAlignment="Center"
+                                                HorizontalAlignment="Left"
                                                 VerticalAlignment="Center">
                                         <Button Content="编辑"
                                                 Style="{StaticResource TableEditButtonStyle}"
@@ -311,33 +282,61 @@
             </StackPanel>
         </Border>
 
-        <!-- 分页控件 -->
-        <Grid Grid.Row="3" Margin="0,16,0,0">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
-            </Grid.ColumnDefinitions>
-            <StackPanel Grid.Column="1" Orientation="Horizontal">
-                <Button Content="上一页" 
-                        Command="{Binding PreviousPageCommand}"
-                        Padding="12,6"
-                        Margin="0,0,8,0"
-                        FontSize="12"/>
-                <TextBlock Text="{Binding CurrentPage, StringFormat='第 {0} 页'}"
-                           VerticalAlignment="Center"
-                           FontSize="12"
-                           Foreground="{StaticResource TextColorBrush}"
-                           Margin="0,0,8,0"/>
-                <TextBlock Text="{Binding TotalPages, StringFormat='共 {0} 页'}"
-                           VerticalAlignment="Center"
-                           FontSize="12"
-                           Foreground="{StaticResource SecondaryTextColorBrush}"
-                           Margin="0,0,8,0"/>
-                <Button Content="下一页" 
-                        Command="{Binding NextPageCommand}"
-                        Padding="12,6"
-                        FontSize="12"/>
-            </StackPanel>
+            <!-- 分页控件 -->
+            <Grid Grid.Row="2" Margin="0,16,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                    <Button Content="上一页" 
+                            Command="{Binding PreviousPageCommand}"
+                            Padding="12,6"
+                            Margin="0,0,8,0"
+                            FontSize="12"/>
+                    <TextBlock Text="{Binding CurrentPage, StringFormat='第 {0} 页'}"
+                               VerticalAlignment="Center"
+                               FontSize="12"
+                               Foreground="{StaticResource TextColorBrush}"
+                               Margin="0,0,8,0"/>
+                    <TextBlock Text="{Binding TotalPages, StringFormat='共 {0} 页'}"
+                               VerticalAlignment="Center"
+                               FontSize="12"
+                               Foreground="{StaticResource SecondaryTextColorBrush}"
+                               Margin="0,0,8,0"/>
+                    <Button Content="下一页" 
+                            Command="{Binding NextPageCommand}"
+                            Padding="12,6"
+                            FontSize="12"/>
+                </StackPanel>
+            </Grid>
         </Grid>
+
+        <!-- 加载遮罩层 -->
+        <Border Background="#80000000" 
+                Panel.ZIndex="1000"
+                Visibility="{Binding IsLoading, Converter={StaticResource BoolToVisibilityConverter}}">
+            <Border Background="White" 
+                    CornerRadius="8" 
+                    Padding="32,24"
+                    HorizontalAlignment="Center" 
+                    VerticalAlignment="Center">
+                <Border.Effect>
+                    <DropShadowEffect Color="#40000000" Direction="270" ShadowDepth="4" BlurRadius="12" Opacity="0.3"/>
+                </Border.Effect>
+                <StackPanel HorizontalAlignment="Center">
+                    <TextBlock Text="处理中..." 
+                               FontSize="16" 
+                               FontWeight="SemiBold"
+                               Foreground="{StaticResource TextColorBrush}"
+                               HorizontalAlignment="Center"/>
+                    <TextBlock Text="请稍候" 
+                               FontSize="12" 
+                               Foreground="{StaticResource SecondaryTextColorBrush}"
+                               HorizontalAlignment="Center"
+                               Margin="0,8,0,0"/>
+                </StackPanel>
+            </Border>
+        </Border>
     </Grid>
 </UserControl>

@@ -5,8 +5,11 @@ using System.Threading.Tasks;
 using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
+using CommunityToolkit.Mvvm.Messaging.Messages;
 using Microsoft.Win32;
 using Timer.Data;
+using Timer.Messages;
 using Timer.Models;
 using Timer.Services;
 using Timer.Views;
@@ -16,7 +19,7 @@ namespace Timer.ViewModels
     /// <summary>
     /// 芯片设备页面的ViewModel
     /// </summary>
-    public class ChipViewModel : ObservableObject, IDisposable
+    public class ChipViewModel : ObservableObject, IDisposable, IRecipient<DataReloadRequestedMessage>
     {
         private readonly IChipRepository _repository;
         private readonly IChipImportService _chipImportService;
@@ -53,8 +56,25 @@ namespace Timer.ViewModels
             EditChipCommand = new AsyncRelayCommand<Chip>(EditChipAsync);
             DeleteChipCommand = new AsyncRelayCommand<Chip>(DeleteChipAsync);
 
+            WeakReferenceMessenger.Default.Register<DataReloadRequestedMessage>(this);
+
             // 初始化时加载数据
             _ = LoadChipGroupsAsync();
+        }
+
+        public void Receive(DataReloadRequestedMessage message)
+        {
+            if (message == null) return;
+
+            switch (message.Value)
+            {
+                case DataDomain.ChipGroups:
+                    _ = LoadChipGroupsAsync();
+                    break;
+                case DataDomain.Chips:
+                    _ = LoadChipsAsync();
+                    break;
+            }
         }
 
         /// <summary>
@@ -160,12 +180,7 @@ namespace Timer.ViewModels
             try
             {
                 IsLoading = true;
-                var groups = await _repository.GetAllChipGroupsAsync();
-                ChipGroups.Clear();
-                foreach (var group in groups)
-                {
-                    ChipGroups.Add(group);
-                }
+                await LoadChipGroupsInternalAsync();
             }
             catch (Exception ex)
             {
@@ -175,6 +190,19 @@ namespace Timer.ViewModels
             finally
             {
                 IsLoading = false;
+            }
+        }
+
+        /// <summary>
+        /// 加载芯片组列表（内部方法，不设置IsLoading）
+        /// </summary>
+        private async Task LoadChipGroupsInternalAsync()
+        {
+            var groups = await _repository.GetAllChipGroupsAsync();
+            ChipGroups.Clear();
+            foreach (var group in groups)
+            {
+                ChipGroups.Add(group);
             }
         }
 
@@ -247,6 +275,9 @@ namespace Timer.ViewModels
                     _loggingService?.Info($"芯片组已更新: {group.GroupName}");
                     // 刷新列表
                     await LoadChipGroupsAsync();
+                    // 通知其它页面：芯片组列表/分组列表可能需要刷新（批量/引用场景）
+                    WeakReferenceMessenger.Default.Send(new DataReloadRequestedMessage(DataDomain.ChipGroups));
+                    WeakReferenceMessenger.Default.Send(new DataReloadRequestedMessage(DataDomain.RaceGroups));
                 }
             }
             catch (Exception ex)
@@ -285,6 +316,8 @@ namespace Timer.ViewModels
                     
                     // 刷新列表
                     await LoadChipGroupsAsync();
+                    WeakReferenceMessenger.Default.Send(new DataReloadRequestedMessage(DataDomain.ChipGroups));
+                    WeakReferenceMessenger.Default.Send(new DataReloadRequestedMessage(DataDomain.RaceGroups));
                     
                     MessageBox.Show($"芯片组 \"{group.GroupName}\" 已删除", "删除成功", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
@@ -320,6 +353,7 @@ namespace Timer.ViewModels
                     _loggingService?.Info($"芯片已更新: {chip.LabelNumber}");
                     // 刷新芯片列表
                     await LoadChipsAsync();
+                    WeakReferenceMessenger.Default.Send(new DataReloadRequestedMessage(DataDomain.Chips));
                 }
             }
             catch (Exception ex)
@@ -355,6 +389,8 @@ namespace Timer.ViewModels
                     
                     // 更新芯片组的数量
                     await LoadChipGroupsAsync();
+                    WeakReferenceMessenger.Default.Send(new DataReloadRequestedMessage(DataDomain.Chips));
+                    WeakReferenceMessenger.Default.Send(new DataReloadRequestedMessage(DataDomain.ChipGroups));
                     
                     MessageBox.Show($"芯片 \"{chip.LabelNumber}\" 已删除", "删除成功", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
@@ -375,6 +411,7 @@ namespace Timer.ViewModels
         /// </summary>
         private async Task ImportExcelAsync()
         {
+            _loggingService?.Info("[按钮点击] 芯片管理 - 导入芯片信息按钮");
             try
             {
                 var dialog = new OpenFileDialog
@@ -385,12 +422,49 @@ namespace Timer.ViewModels
 
                 if (dialog.ShowDialog() == true)
                 {
+                    _loggingService?.Info($"[导入] 选择文件: {dialog.FileName}");
+                    
+                    // 确认是否清空现有数据
+                    var confirmResult = MessageBox.Show(
+                        "导入将清空以下所有数据，然后重新导入：\n\n" +
+                        "• 芯片组和芯片数据\n" +
+                        "• 比赛分组数据\n" +
+                        "• 比赛记录数据\n" +
+                        "• 圈次成绩数据\n\n" +
+                        "此操作不可恢复，确定要继续吗？",
+                        "确认导入",
+                        MessageBoxButton.YesNo,
+                        MessageBoxImage.Warning);
+
+                    if (confirmResult != MessageBoxResult.Yes)
+                    {
+                        _loggingService?.Info("[导入] 用户取消导入");
+                        return;
+                    }
+
+                    _loggingService?.Info("[导入] 用户确认导入，开始清空数据并导入");
                     IsLoading = true;
                     ImportProgress = 0;
                     ImportResult = null;
 
+                    // 让UI有机会刷新显示遮罩层
+                    await Task.Delay(50);
+
+                    string? resultMessage = null;
+                    string? resultTitle = null;
+                    MessageBoxImage resultIcon = MessageBoxImage.Information;
+
                     try
                     {
+                        // 先清空所有芯片组和芯片数据
+                        await _repository.DeleteAllChipGroupsAndChipsAsync();
+                        _loggingService?.Info("已清空现有芯片数据，准备重新导入");
+                        
+                        // 清空当前选中
+                        SelectedChipGroup = null;
+                        ChipGroups.Clear();
+                        Chips.Clear();
+
                         // 读取Excel文件
                         var chipData = await _chipImportService.ReadFromFileAsync(dialog.FileName);
 
@@ -400,39 +474,47 @@ namespace Timer.ViewModels
 
                         if (ImportResult.IsSuccess())
                         {
-                            MessageBox.Show(
-                                $"成功导入{ImportResult.SuccessCount}条记录",
-                                "导入成功",
-                                MessageBoxButton.OK,
-                                MessageBoxImage.Information);
+                            resultMessage = $"成功导入{ImportResult.SuccessCount}条记录";
+                            resultTitle = "导入成功";
+                            resultIcon = MessageBoxImage.Information;
                         }
                         else
                         {
-                            var errorMessage = $"导入完成：成功{ImportResult.SuccessCount}条，失败{ImportResult.FailureCount}条\n\n";
-                            errorMessage += string.Join("\n", ImportResult.Errors.Take(10).Select(e => e.ToString()));
+                            resultMessage = $"导入完成：成功{ImportResult.SuccessCount}条，失败{ImportResult.FailureCount}条\n\n";
+                            resultMessage += string.Join("\n", ImportResult.Errors.Take(10).Select(e => e.ToString()));
                             if (ImportResult.Errors.Count > 10)
                             {
-                                errorMessage += $"\n... 还有{ImportResult.Errors.Count - 10}个错误";
+                                resultMessage += $"\n... 还有{ImportResult.Errors.Count - 10}个错误";
                             }
-
-                            MessageBox.Show(
-                                errorMessage,
-                                "导入完成（有错误）",
-                                MessageBoxButton.OK,
-                                MessageBoxImage.Warning);
+                            resultTitle = "导入完成（有错误）";
+                            resultIcon = MessageBoxImage.Warning;
                         }
 
-                        // 刷新列表
-                        await LoadChipGroupsAsync();
+                        // 刷新列表（使用内部方法，不重置IsLoading）
+                        await LoadChipGroupsInternalAsync();
+                        WeakReferenceMessenger.Default.Send(new DataReloadRequestedMessage(DataDomain.ChipGroups));
+                        WeakReferenceMessenger.Default.Send(new DataReloadRequestedMessage(DataDomain.Chips));
+                        WeakReferenceMessenger.Default.Send(new DataReloadRequestedMessage(DataDomain.RaceGroups));
                     }
                     catch (Exception ex)
                     {
                         _loggingService?.Error($"导入Excel文件失败: {ex.Message}", ex);
-                        MessageBox.Show($"导入Excel文件失败: {ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                        resultMessage = $"导入Excel文件失败: {ex.Message}";
+                        resultTitle = "错误";
+                        resultIcon = MessageBoxImage.Error;
                     }
                     finally
                     {
+                        // 关闭遮罩层
                         IsLoading = false;
+                        // 让UI有机会刷新关闭遮罩层
+                        await Task.Delay(50);
+                    }
+
+                    // 在遮罩层关闭后显示结果
+                    if (resultMessage != null && resultTitle != null)
+                    {
+                        MessageBox.Show(resultMessage, resultTitle, MessageBoxButton.OK, resultIcon);
                     }
                 }
             }
@@ -460,6 +542,7 @@ namespace Timer.ViewModels
         {
             if (!_disposed && disposing)
             {
+                WeakReferenceMessenger.Default.UnregisterAll(this);
                 // 清理托管资源
                 _disposed = true;
             }

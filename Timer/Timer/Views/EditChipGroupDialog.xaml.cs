@@ -1,5 +1,7 @@
 using System;
 using System.Windows;
+using CommunityToolkit.Mvvm.Messaging;
+using Timer.Messages;
 using Timer.Models;
 using Timer.Services;
 using Timer.ViewModels;
@@ -48,6 +50,9 @@ namespace Timer.Views
                 var updated = _vm.ToChipGroup();
                 await _repository.UpdateChipGroupAsync(updated);
                 _loggingService?.Info($"成功更新芯片组: {updated.GroupName} (ID: {updated.Id})");
+
+                // 广播更新消息，供其他页面实时刷新（人员分组/计时等）
+                WeakReferenceMessenger.Default.Send(new ChipGroupUpdatedMessage(updated));
 
                 // 设置对话框结果为成功
                 DialogResult = true;

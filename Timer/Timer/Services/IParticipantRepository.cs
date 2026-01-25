@@ -63,6 +63,12 @@ namespace Timer.Services
         Task DeleteBatchAsync(IEnumerable<int> ids);
 
         /// <summary>
+        /// 根据项目ID删除所有参赛人员
+        /// </summary>
+        /// <param name="projectId">项目ID</param>
+        Task DeleteByProjectIdAsync(int projectId);
+
+        /// <summary>
         /// 检查准考证号是否已存在
         /// </summary>
         /// <param name="examNumber">准考证号</param>

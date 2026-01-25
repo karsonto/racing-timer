@@ -1,0 +1,119 @@
+name: Release Build
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
+
+# 添加必要的权限配置
+permissions:
+  contents: write
+  packages: write
+
+jobs:
+  create-release:
+    name: 创建发布版本
+    runs-on: windows-latest
+    
+    steps:
+    - name: 检出代码
+      uses: actions/checkout@v6
+      
+    - name: 设置 .NET
+      uses: actions/setup-dotnet@v5
+      with:
+        dotnet-version: '10.0.x'
+        
+    - name: 还原依赖
+      run: dotnet restore Timer/Timer/Timer.csproj
+      
+    - name: 发布 (x64 - 包含运行时)
+      run: dotnet publish Timer/Timer/Timer.csproj -c Release -r win-x64 --self-contained true -o Timer/Timer/publish
+      
+    - name: 安装 Inno Setup
+      run: |
+        choco install innosetup -y
+        echo "C:\Program Files (x86)\Inno Setup 6" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+      shell: pwsh
+      
+    - name: 构建安装程序
+      run: |
+        # 创建输出目录
+        New-Item -ItemType Directory -Force -Path installer
+        
+        # 使用 Inno Setup 编译
+        & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" setup.iss
+        
+        if ($LASTEXITCODE -ne 0) {
+          Write-Error "Inno Setup 构建失败！"
+          exit 1
+        }
+        
+        Write-Host "安装程序构建成功！"
+        Get-ChildItem installer\*.exe
+      shell: pwsh
+      
+    - name: 压缩便携版
+      run: Compress-Archive -Path Timer/Timer/publish/* -DestinationPath Timer-Portable-x64.zip
+      
+    - name: 获取版本号
+      id: get_version
+      run: |
+        if ("${{ github.ref }}" -like "refs/tags/*") {
+          $version = "${{ github.ref }}" -replace "refs/tags/", ""
+        } else {
+          $version = "dev-${{ github.sha }}".Substring(0, 15)
+        }
+        echo "version=$version" >> $env:GITHUB_OUTPUT
+        
+        # 获取安装包文件名
+        $installerFile = Get-ChildItem installer\*.exe | Select-Object -First 1 -ExpandProperty Name
+        if ($installerFile) {
+          echo "installer_name=$installerFile" >> $env:GITHUB_OUTPUT
+        }
+      shell: pwsh
+      
+    - name: 创建 GitHub Release
+      uses: softprops/action-gh-release@v2
+      if: startsWith(github.ref, 'refs/tags/')
+      with:
+        files: |
+          installer/*.exe
+          Timer-Portable-x64.zip
+        draft: false
+        prerelease: false
+        generate_release_notes: true
+        body: |
+          ## 📦 下载方式
+          
+          ### 🎯 推荐：安装版（自动配置）
+          - **文件**: `RaceTimerPro_Setup_v*.exe`
+          - **说明**: 双击安装，自动创建快捷方式
+          - **包含**: .NET 运行时（无需单独安装）
+          - **大小**: 约 150MB
+          
+          ### 💼 便携版（免安装）
+          - **文件**: `Timer-Portable-x64.zip`
+          - **说明**: 解压后直接运行 `Timer.exe`
+          - **包含**: .NET 运行时
+          - **大小**: 约 150MB
+          
+          ## 🆕 更新内容
+          详见下方自动生成的发布说明。
+          
+          ## 📋 系统要求
+          - Windows 10/11 (64位)
+          - 约 200MB 磁盘空间
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+    - name: 上传构建产物
+      uses: actions/upload-artifact@v6
+      with:
+        name: Timer-Release-${{ steps.get_version.outputs.version }}
+        path: |
+          installer/*.exe
+          Timer-Portable-x64.zip
+        retention-days: 30
+

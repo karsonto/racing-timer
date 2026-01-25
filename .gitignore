@@ -1,114 +1,87 @@
-## .NET Build Output
-[Bb]in/
-[Oo]bj/
-[Ll]og/
-[Ll]ogs/
+# .NET 构建输出
+bin/
+obj/
+publish/
+installer/
 
-## Visual Studio / Rider
+# Visual Studio / Rider
 .vs/
-.vscode/
 .idea/
 *.suo
 *.user
 *.userosscache
 *.sln.docstates
-*.sln.iml
+*.userprefs
 
-## Build Results
+# Build results
 [Dd]ebug/
 [Dd]ebugPublic/
 [Rr]elease/
 [Rr]eleases/
 x64/
 x86/
-[Ww][Ii][Nn]32/
 [Aa][Rr][Mm]/
 [Aa][Rr][Mm]64/
 bld/
 [Bb]in/
 [Oo]bj/
+[Ll]og/
+[Ll]ogs/
 
-## .NET Core / NuGet
-project.lock.json
-project.fragment.lock.json
-artifacts/
-**/packages/*
-!**/packages/build/
+# Visual Studio cache/options
+.vs/
+.vscode/
+
+# ReSharper
+_ReSharper*/
+*.[Rr]e[Ss]harper
+*.DotSettings.user
+
+# NuGet
 *.nupkg
 *.snupkg
+**/packages/*
+!**/packages/build/
 *.nuget.props
 *.nuget.targets
 
-## Test Results
-[Tt]est[Rr]esult*/
-[Bb]uild[Ll]og.*
-*.VisualState.xml
-TestResult.xml
-nunit-*.xml
+# MSBuild Binary and Structured Log
+*.binlog
 
-## Coverage Reports
-coverage*.json
-coverage*.xml
-coverage*.info
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
 
-## Database Files
+# Installer files
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+installer/*.exe
+!installer/*_Setup_*.exe
+
+# Temporary files
+*.tmp
+*.temp
+~$*
+
+# Database files (if needed, remove this line)
 *.db
 *.db-shm
 *.db-wal
-*.sqlite
-*.sqlite3
-Timer/data/
 
-## Publish Output
-**/publish/
-**/bin/Publish/
-
-## Installer Output
-installer/
-Output/
-*.exe
-!Timer/Timer/bin/Debug/net*/Timer.exe
-!Timer/Timer/bin/Release/net*/Timer.exe
-
-## Inno Setup
-*.iss.bak
-*.isscache
-
-## Temporary Files
-*.tmp
-*.temp
-*~
-*.swp
-*.swo
-.DS_Store
-Thumbs.db
-
-## Python (for test scripts)
+# Python
 __pycache__/
 *.py[cod]
 *$py.class
-*.so
+*.pyc
 .Python
-env/
 venv/
 ENV/
-env.bak/
-venv.bak/
-*.egg-info/
-dist/
-build/
 
-## Test Data Files (uncomment if you don't want to commit test files)
-# 测试数据.xlsx
-# 测试数据.csv
-# 人员导入模板.xls
-# 芯片测试数据.xlsx
-# generate_test_excel.py
-# create_test_excel.*
-
-## Application Specific
-*.rsuser
-.cursor/
-.specify/
-
-
+# Excel temp files
+~$*.xls
+~$*.xlsx

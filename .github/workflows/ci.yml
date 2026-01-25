@@ -1,0 +1,71 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, master, develop ]
+  pull_request:
+    branches: [ main, master, develop ]
+
+# 添加必要的权限配置
+permissions:
+  contents: read
+
+jobs:
+  build-and-test:
+    name: 构建和测试
+    runs-on: windows-latest
+    
+    steps:
+    - name: 检出代码
+      uses: actions/checkout@v6
+      
+    - name: 设置 .NET
+      uses: actions/setup-dotnet@v5
+      with:
+        dotnet-version: '10.0.x'
+        
+    - name: 还原依赖
+      run: dotnet restore Timer/Timer/Timer.csproj
+      
+    - name: 编译项目 (Debug)
+      run: dotnet build Timer/Timer/Timer.csproj --configuration Debug --no-restore
+      
+    - name: 编译项目 (Release)
+      run: dotnet build Timer/Timer/Timer.csproj --configuration Release --no-restore
+      
+    # 如果将来添加了单元测试项目，取消下面的注释
+    # - name: 运行测试
+    #   run: dotnet test --no-build --verbosity normal --configuration Debug
+      
+    - name: 上传构建产物 (Release)
+      uses: actions/upload-artifact@v6
+      if: success()
+      with:
+        name: Timer-Release-${{ github.sha }}
+        path: Timer/Timer/bin/Release/net10.0-windows/
+        retention-days: 7
+        
+  code-quality:
+    name: 代码质量检查
+    runs-on: windows-latest
+    
+    steps:
+    - name: 检出代码
+      uses: actions/checkout@v6
+      
+    - name: 设置 .NET
+      uses: actions/setup-dotnet@v5
+      with:
+        dotnet-version: '10.0.x'
+        
+    - name: 还原依赖
+      run: dotnet restore Timer/Timer/Timer.csproj
+      
+    - name: 代码格式检查
+      run: dotnet format Timer/Timer/Timer.csproj --verify-no-changes --no-restore
+      continue-on-error: true
+      
+    - name: 编译时警告检查
+      run: dotnet build Timer/Timer/Timer.csproj --configuration Release --no-restore /warnaserror:CS0618
+      continue-on-error: true
+

@@ -81,6 +81,11 @@ namespace Timer.Services
         Task<bool> ExistsByLabelNumberAsync(string labelNumber);
 
         /// <summary>
+        /// 清空所有芯片组和芯片数据
+        /// </summary>
+        Task DeleteAllChipGroupsAndChipsAsync();
+
+        /// <summary>
         /// 开始事务
         /// </summary>
         Task BeginTransactionAsync();

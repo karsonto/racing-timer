@@ -10,11 +10,11 @@ none
 false
 TRACE;DEBUG;NET;NET10_0;NETCOREAPP;WINDOWS;WINDOWS7_0;NET5_0_OR_GREATER;NET6_0_OR_GREATER;NET7_0_OR_GREATER;NET8_0_OR_GREATER;NET9_0_OR_GREATER;NET10_0_OR_GREATER;NETCOREAPP3_0_OR_GREATER;NETCOREAPP3_1_OR_GREATER;WINDOWS7_0_OR_GREATER
 D:\ai_coding\test2\tt\Timer\Timer\App.xaml
-11690770382
+131366265813
 
-49-1066725803
-2171759778678
-MainWindow.xaml;Resources\Styles.xaml;Views\ChipView.xaml;Views\DeviceView.xaml;Views\EditChipDialog.xaml;Views\EditChipGroupDialog.xaml;Views\EditParticipantDialog.xaml;Views\GroupView.xaml;Views\ParticipantView.xaml;Views\RaceTimerView.xaml;Views\ScoreView.xaml;
+73-1368070517
+217-282593136
+MainWindow.xaml;Resources\Styles.xaml;Views\ChipView.xaml;Views\DeviceView.xaml;Views\EditChipDialog.xaml;Views\EditChipGroupDialog.xaml;Views\EditGroupMemberDialog.xaml;Views\EditParticipantDialog.xaml;Views\EditRaceGroupDialog.xaml;Views\GroupView.xaml;Views\ParticipantView.xaml;Views\RaceTimerView.xaml;Views\ScoreView.xaml;
 
 False
 
