@@ -2,7 +2,7 @@
 ; 请确保已安装 Inno Setup: https://jrsoftware.org/isinfo.php
 
 #define MyAppName "比赛计时系统"
-#define MyAppVersion "1.0.3"
+#define MyAppVersion "1.0.4"
 #define MyAppPublisher "Race Timer Pro"
 #define MyAppExeName "Timer.exe"
 #define MyAppURL "https://github.com/karsonto/racing-timer"
