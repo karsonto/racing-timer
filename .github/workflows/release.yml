@@ -80,7 +80,7 @@ jobs:
       run: Compress-Archive -Path Timer/Timer/publish/* -DestinationPath Timer-Portable-x64.zip
       
     - name: 创建 GitHub Release
-      uses: softprops/action-gh-release@v2
+      uses: softprops/action-gh-release@v3
       if: startsWith(github.ref, 'refs/tags/')
       with:
         files: |
