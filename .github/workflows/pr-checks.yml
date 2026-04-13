@@ -40,7 +40,7 @@ jobs:
       continue-on-error: false
       
     - name: PR 大小检查
-      uses: actions/github-script@v7
+      uses: actions/github-script@v9
       with:
         script: |
           const pr = context.payload.pull_request;
@@ -55,7 +55,7 @@ jobs:
           }
           
     - name: 添加 PR 评论
-      uses: actions/github-script@v7
+      uses: actions/github-script@v9
       if: success()
       continue-on-error: true
       with:
